@@ -135,6 +135,36 @@ int32 UGaussianSplatComponent::GetSplatCount() const
 	return SplatAsset ? SplatAsset->GetSplatCount() : 0;
 }
 
+void UGaussianSplatComponent::SetOpacityScale(float NewOpacityScale)
+{
+	OpacityScale = FMath::Clamp(NewOpacityScale, 0.0f, 2.0f);
+	MarkRenderDynamicDataDirty();
+}
+
+void UGaussianSplatComponent::SetSplatScale(float NewSplatScale)
+{
+	SplatScale = FMath::Clamp(NewSplatScale, 0.1f, 10.0f);
+	MarkRenderDynamicDataDirty();
+}
+
+void UGaussianSplatComponent::SendRenderDynamicData_Concurrent()
+{
+	Super::SendRenderDynamicData_Concurrent();
+
+	if (FGaussianSplatSceneProxy* Proxy = static_cast<FGaussianSplatSceneProxy*>(SceneProxy))
+	{
+		const float CapturedOpacity = OpacityScale;
+		const float CapturedScale   = SplatScale;
+
+		ENQUEUE_RENDER_COMMAND(GaussianSplatUpdateDynamicData)(
+			[Proxy, CapturedOpacity, CapturedScale](FRHICommandListImmediate&)
+			{
+				Proxy->SetOpacityScale_RenderThread(CapturedOpacity);
+				Proxy->SetSplatScale_RenderThread(CapturedScale);
+			});
+	}
+}
+
 void UGaussianSplatComponent::OnAssetChanged()
 {
 	bBoundsCached = false;

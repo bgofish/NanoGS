@@ -374,6 +374,10 @@ public:
 	int32 GetSHOrder() const { return SHOrder; }
 	float GetOpacityScale() const { return OpacityScale; }
 	float GetSplatScale() const { return SplatScale; }
+
+	/** Thread-safe setters — called from game thread via ENQUEUE_RENDER_COMMAND */
+	void SetOpacityScale_RenderThread(float NewValue) { OpacityScale = NewValue; }
+	void SetSplatScale_RenderThread(float NewValue)   { SplatScale = NewValue; }
 	float GetLODErrorThreshold() const { return LODErrorThreshold; }
 
 	/** Check if this proxy is safe to use for rendering.

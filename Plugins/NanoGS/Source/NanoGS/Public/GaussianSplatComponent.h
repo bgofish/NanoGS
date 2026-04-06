@@ -32,6 +32,7 @@ public:
 	virtual void OnRegister() override;
 	virtual void OnUnregister() override;
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	virtual void SendRenderDynamicData_Concurrent() override;
 	//~ End UActorComponent Interface
 
 	//~ Begin UPrimitiveComponent Interface
@@ -52,6 +53,14 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Gaussian Splatting")
 	int32 GetSplatCount() const;
 
+	/** Set the global opacity multiplier at runtime (animatable via Sequencer) */
+	UFUNCTION(BlueprintCallable, Category = "Gaussian Splatting|Rendering")
+	void SetOpacityScale(float NewOpacityScale);
+
+	/** Set the splat size scale multiplier at runtime (animatable via Sequencer) */
+	UFUNCTION(BlueprintCallable, Category = "Gaussian Splatting|Rendering")
+	void SetSplatScale(float NewSplatScale);
+
 public:
 	/** The Gaussian Splat asset to render */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gaussian Splatting")
@@ -65,12 +74,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gaussian Splatting|Performance", meta = (ClampMin = "1", ClampMax = "10"))
 	int32 SortEveryNthFrame = 1;
 
-	/** Global opacity multiplier */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gaussian Splatting|Rendering", meta = (ClampMin = "0.0", ClampMax = "2.0"))
+	/** Global opacity multiplier (animatable via Sequencer) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Interp, Category = "Gaussian Splatting|Rendering", meta = (ClampMin = "0.0", ClampMax = "2.0"))
 	float OpacityScale = 1.0f;
 
-	/** Scale multiplier for splat sizes */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gaussian Splatting|Rendering", meta = (ClampMin = "0.1", ClampMax = "10.0"))
+	/** Scale multiplier for splat sizes (animatable via Sequencer) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Interp, Category = "Gaussian Splatting|Rendering", meta = (ClampMin = "0.1", ClampMax = "10.0"))
 	float SplatScale = 1.0f;
 
 	/** Enable frustum culling for better performance */
